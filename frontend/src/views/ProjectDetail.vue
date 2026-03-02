@@ -42,7 +42,16 @@
     </div>
 
     <!-- 快捷操作 -->
-    <div class="grid grid-cols-4 gap-4 mb-6">
+    <div class="grid grid-cols-5 gap-4 mb-6">
+      <button 
+        @click="openProjectFolder"
+        class="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow text-left"
+      >
+        <FolderIcon class="w-8 h-8 text-gray-500 mb-3" />
+        <h3 class="font-semibold text-gray-800">项目文件夹</h3>
+        <p class="text-sm text-gray-500">打开或复制文件夹路径</p>
+      </button>
+
       <router-link 
         :to="`/projects/${project.id}/script`"
         class="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow"
@@ -62,7 +71,7 @@
       </router-link>
       
       <router-link 
-        to="/assets"
+        :to="{ path: '/assets', query: { projectId: project.id, projectName: project.title } }"
         class="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow"
       >
         <PhotoIcon class="w-8 h-8 text-green-500 mb-3" />
@@ -130,17 +139,42 @@
       返回项目列表
     </router-link>
   </div>
+
+  <!-- 复制成功提示 -->
+  <Transition
+    enter-active-class="transition duration-300 ease-out"
+    enter-from-class="transform translate-y-2 opacity-0"
+    enter-to-class="transform translate-y-0 opacity-100"
+    leave-active-class="transition duration-200 ease-in"
+    leave-from-class="transform translate-y-0 opacity-100"
+    leave-to-class="transform translate-y-2 opacity-0"
+  >
+    <div
+      v-if="showCopyToast"
+      class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg z-50"
+    >
+      <div class="flex items-center space-x-2">
+        <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+        </svg>
+        <span>文件夹路径已复制到剪贴板</span>
+      </div>
+    </div>
+  </Transition>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useProjectStore } from '../stores'
+import { projectApi } from '../api'
 import { 
   DocumentTextIcon, 
   FilmIcon, 
   PhotoIcon, 
-  VideoCameraIcon 
+  VideoCameraIcon,
+  FolderIcon,
+  ChevronRightIcon
 } from '@heroicons/vue/24/outline'
 import { format } from 'date-fns'
 import { zhCN } from 'date-fns/locale'
@@ -148,6 +182,39 @@ import { zhCN } from 'date-fns/locale'
 const route = useRoute()
 const router = useRouter()
 const projectStore = useProjectStore()
+
+const projectFolderPath = ref('')
+const showCopyToast = ref(false)
+
+// 加载项目文件夹路径
+onMounted(async () => {
+  if (project.value) {
+    try {
+      const response = await projectApi.getProjectFolder(project.value.id)
+      if (response.data) {
+        projectFolderPath.value = response.data.folderPath
+      }
+    } catch (error) {
+      console.error('获取项目文件夹失败:', error)
+    }
+  }
+})
+
+// 打开项目文件夹（复制路径到剪贴板）
+const openProjectFolder = async () => {
+  if (projectFolderPath.value) {
+    try {
+      await navigator.clipboard.writeText(projectFolderPath.value)
+      showCopyToast.value = true
+      setTimeout(() => {
+        showCopyToast.value = false
+      }, 2000)
+    } catch (error) {
+      console.error('复制路径失败:', error)
+      alert('项目文件夹路径: ' + projectFolderPath.value)
+    }
+  }
+}
 
 const project = computed(() => 
   projectStore.projects.find(p => p.id === route.params.id)

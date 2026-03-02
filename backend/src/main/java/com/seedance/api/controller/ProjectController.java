@@ -115,6 +115,31 @@ public class ProjectController {
     }
 
     /**
+     * 获取项目文件夹路径
+     */
+    @GetMapping("/{id}/folder")
+    public ResponseEntity<?> getProjectFolder(@PathVariable String id) {
+        try {
+            Project project = projectService.getProject(id);
+            if (project == null) {
+                return ResponseEntity.notFound().build();
+            }
+            
+            String folderPath = projectService.getProjectFolderPath(id);
+            Map<String, Object> data = new HashMap<>();
+            data.put("projectId", id);
+            data.put("folderPath", folderPath);
+            data.put("exists", projectService.projectExists(id));
+            
+            return ResponseEntity.ok(createSuccessResponse("获取项目文件夹成功", data));
+        } catch (Exception e) {
+            logger.error("获取项目文件夹失败: {}", id, e);
+            return ResponseEntity.internalServerError()
+                .body(createErrorResponse("获取项目文件夹失败: " + e.getMessage()));
+        }
+    }
+
+    /**
      * 获取项目剧集
      */
     @GetMapping("/{id}/episodes")

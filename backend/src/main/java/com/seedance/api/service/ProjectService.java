@@ -436,6 +436,22 @@ public class ProjectService {
     }
 
     /**
+     * 获取项目文件夹路径
+     */
+    public String getProjectFolderPath(String projectId) {
+        Path projectPath = getProjectsPath().resolve(projectId);
+        return projectPath.toString();
+    }
+
+    /**
+     * 检查项目是否存在
+     */
+    public boolean projectExists(String projectId) {
+        Path projectPath = getProjectsPath().resolve(projectId);
+        return Files.exists(projectPath) && Files.isDirectory(projectPath);
+    }
+
+    /**
      * 获取 projects 目录路径
      */
     private Path getProjectsPath() {

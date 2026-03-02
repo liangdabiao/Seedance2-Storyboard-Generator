@@ -74,6 +74,11 @@ export const projectApi = {
       throw new Error(response.data.message || '删除失败')
     }
   },
+
+  async getProjectFolder(id: string): Promise<{ success: boolean; data: { folderPath: string; exists: boolean } }> {
+    const response = await apiClient.get(`/projects/${id}/folder`)
+    return response.data
+  },
 }
 
 // 视频任务 API

@@ -1,14 +1,53 @@
 <template>
   <div>
     <div class="flex items-center justify-between mb-8">
-      <h1 class="text-3xl font-bold text-gray-800">素材管理</h1>
+      <div>
+        <h1 class="text-3xl font-bold text-gray-800">{{ projectName }}</h1>
+        <p v-if="projectId" class="text-sm text-gray-500 mt-1">项目 ID: {{ projectId }}</p>
+      </div>
       
-      <button 
-        @click="showUploadModal = true"
-        class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+      <div class="flex items-center space-x-3">
+        <button 
+          v-if="projectId"
+          @click="openProjectFolder"
+          class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center space-x-2"
+        >
+          <FolderIcon class="w-5 h-5" />
+          <span>打开文件夹</span>
+        </button>
+        
+        <button 
+          @click="showUploadModal = true"
+          class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          + 上传素材
+        </button>
+      </div>
+    </div>
+
+    <!-- 项目选择提示 -->
+    <div v-if="!projectId" class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-6">
+      <div class="flex items-center space-x-3">
+        <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+        </svg>
+        <div>
+          <p class="font-medium text-yellow-800">未选择项目</p>
+          <p class="text-sm text-yellow-600">请从项目列表中选择一个项目来查看素材</p>
+        </div>
+      </div>
+      <router-link 
+        to="/projects" 
+        class="mt-3 inline-block px-4 py-2 bg-yellow-100 text-yellow-800 rounded-lg hover:bg-yellow-200"
       >
-        + 上传素材
-      </button>
+        前往项目列表
+      </router-link>
+    </div>
+
+    <!-- 加载状态 -->
+    <div v-else-if="loading" class="text-center py-12">
+      <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-4"></div>
+      <p class="text-gray-500">加载素材中...</p>
     </div>
 
     <!-- 素材分类标签 -->
@@ -80,9 +119,11 @@
     </div>
 
     <!-- 空状态 -->
-    <div v-if="filteredAssets.length === 0" class="text-center py-12">
+    <div v-if="projectId && !loading && filteredAssets.length === 0" class="text-center py-12">
       <PhotoIcon class="w-16 h-16 mx-auto text-gray-300 mb-4" />
-      <p class="text-gray-500">暂无素材，点击右上角上传</p>
+      <p class="text-gray-500 mb-2">该项目暂无素材</p>
+      <p class="text-sm text-gray-400">将图片文件放入项目文件夹即可自动识别</p>
+      <p class="text-xs text-gray-400 mt-2">支持格式: C01-角色, S01-场景, P01-道具</p>
     </div>
 
     <!-- 上传弹窗 -->
@@ -231,21 +272,59 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { useAssetStore } from '../stores'
+import { assetApi } from '../api'
 import { 
   PhotoIcon, 
   EyeIcon, 
   TrashIcon, 
   CloudArrowUpIcon,
-  XMarkIcon 
+  XMarkIcon,
+  FolderIcon
 } from '@heroicons/vue/24/outline'
 import type { Asset } from '../types'
 
+const route = useRoute()
 const assetStore = useAssetStore()
 const assets = computed(() => assetStore.assets)
 
+// 从 URL 获取项目 ID
+const projectId = computed(() => route.query.projectId as string || route.params.projectId as string)
+const projectName = computed(() => route.query.projectName as string || '素材管理')
+
 const activeTab = ref('all')
+const loading = ref(false)
+
+// 加载素材列表
+const loadAssets = async () => {
+  if (!projectId.value) {
+    console.warn('未指定项目 ID，无法加载素材')
+    return
+  }
+  
+  loading.value = true
+  try {
+    const assets = await assetApi.getAssets(projectId.value)
+    assetStore.setAssets(assets)
+    console.log(`加载了 ${assets.length} 个素材`)
+  } catch (error) {
+    console.error('加载素材失败:', error)
+  } finally {
+    loading.value = false
+  }
+}
+
+// 组件挂载时加载素材
+onMounted(() => {
+  loadAssets()
+})
+
+// 监听项目 ID 变化
+watch(() => projectId.value, () => {
+  loadAssets()
+})
 const showUploadModal = ref(false)
 const uploading = ref(false)
 const selectedFile = ref<File | null>(null)
@@ -355,6 +434,24 @@ const previewAsset = (asset: Asset) => {
 const deleteAsset = (id: string) => {
   if (confirm('确定要删除这个素材吗？')) {
     // assetStore.removeAsset(id)
+  }
+}
+
+// 打开项目文件夹
+const openProjectFolder = async () => {
+  if (!projectId.value) return
+  
+  // 尝试复制路径到剪贴板
+  try {
+    const { projectApi } = await import('../api')
+    const response = await projectApi.getProjectFolder(projectId.value)
+    if (response.data?.folderPath) {
+      await navigator.clipboard.writeText(response.data.folderPath)
+      alert('项目文件夹路径已复制到剪贴板: ' + response.data.folderPath)
+    }
+  } catch (error) {
+    console.error('获取项目文件夹路径失败:', error)
+    alert('项目文件夹: projects/' + projectId.value)
   }
 }
 </script>
