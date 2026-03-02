@@ -41,7 +41,7 @@
 
       <!-- 页面内容 -->
       <main class="p-6">
-        <slot></slot>
+        <router-view></router-view>
       </main>
     </div>
   </div>
@@ -55,7 +55,8 @@ import {
   PhotoIcon, 
   VideoCameraIcon,
   ArrowPathIcon,
-  Bars3Icon 
+  Bars3Icon,
+  Cog6ToothIcon 
 } from '@heroicons/vue/24/outline'
 
 const sidebarOpen = ref(true)
@@ -67,5 +68,6 @@ const menuItems = [
   { name: '素材管理', path: '/assets', icon: PhotoIcon },
   { name: '视频任务', path: '/tasks', icon: VideoCameraIcon },
   { name: '工作流', path: '/workflow', icon: ArrowPathIcon },
+  { name: '设置', path: '/settings', icon: Cog6ToothIcon },
 ]
 </script>

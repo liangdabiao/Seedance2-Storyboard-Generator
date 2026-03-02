@@ -170,27 +170,78 @@
         <FilmIcon class="w-16 h-16 mx-auto" />
       </div>
       <p class="text-gray-500 mb-4">还没有分镜，开始创建第一集吧</p>
-      <button 
+      <button
         @click="addEpisode"
         class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
       >
         添加剧集
       </button>
     </div>
+
+    <!-- 素材选择器弹窗 -->
+    <div v-if="showAssetSelector" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-xl p-6 w-full max-w-4xl max-h-[80vh] overflow-hidden flex flex-col">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl font-semibold">选择参考素材</h2>
+          <button @click="showAssetSelector = false" class="p-2 hover:bg-gray-100 rounded-lg">
+            <XMarkIcon class="w-5 h-5" />
+          </button>
+        </div>
+
+        <div v-if="availableAssets.length === 0" class="text-center py-8 text-gray-500">
+          <p>暂无素材，请先上传素材到项目文件夹</p>
+          <p class="text-sm mt-2">支持的命名格式：C01-角色, S01-场景, P01-道具</p>
+        </div>
+
+        <div v-else class="flex-1 overflow-y-auto">
+          <div class="grid grid-cols-4 gap-4">
+            <div
+              v-for="asset in availableAssets"
+              :key="asset.id"
+              class="border rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-blue-500 transition-all"
+              @click="confirmSelectAsset(asset)"
+            >
+              <div class="aspect-square bg-gray-100">
+                <img :src="asset.imageUrl" class="w-full h-full object-cover" />
+              </div>
+              <div class="p-2">
+                <p class="text-xs font-mono text-gray-500">{{ asset.code }}</p>
+                <p class="text-sm font-medium truncate">{{ asset.name }}</p>
+                <span class="text-xs px-2 py-0.5 rounded-full mt-1 inline-block"
+                  :class="getTypeClass(asset.type)">
+                  {{ getTypeLabel(asset.type) }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-4 border-t flex justify-end">
+          <button
+            @click="showAssetSelector = false"
+            class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg"
+          >
+            取消
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useProjectStore } from '../stores'
+import { assetApi } from '../api'
 import { 
   ArrowLeftIcon, 
   TrashIcon, 
   PlusIcon,
-  FilmIcon 
+  FilmIcon,
+  XMarkIcon
 } from '@heroicons/vue/24/outline'
-import type { Episode } from '../types'
+import type { Episode, Asset } from '../types'
 
 const route = useRoute()
 const projectStore = useProjectStore()
@@ -249,9 +300,38 @@ const generateAllVideos = () => {
   })
 }
 
+const showAssetSelector = ref(false)
+const currentEpisode = ref<Episode | null>(null)
+const currentAssetIndex = ref(0)
+const availableAssets = ref<Asset[]>([])
+
+// 加载项目素材
+onMounted(async () => {
+  if (project.value) {
+    try {
+      const assets = await assetApi.getAssets(project.value.id)
+      availableAssets.value = assets
+      console.log('加载了', assets.length, '个素材')
+    } catch (error) {
+      console.error('加载素材失败:', error)
+    }
+  }
+})
+
 const selectAsset = (episode: Episode, index: number) => {
-  // 打开素材选择器
-  console.log('选择素材:', episode.id, index)
+  currentEpisode.value = episode
+  currentAssetIndex.value = index
+  showAssetSelector.value = true
+}
+
+const confirmSelectAsset = (asset: Asset) => {
+  if (currentEpisode.value) {
+    if (!currentEpisode.value.assets) {
+      currentEpisode.value.assets = []
+    }
+    currentEpisode.value.assets[currentAssetIndex.value] = asset.imageUrl
+  }
+  showAssetSelector.value = false
 }
 
 const getStatusClass = (status: string) => {
@@ -272,5 +352,23 @@ const getStatusText = (status: string) => {
     failed: '失败',
   }
   return texts[status] || status
+}
+
+const getTypeLabel = (type: string) => {
+  const labels: Record<string, string> = {
+    character: '角色',
+    scene: '场景',
+    prop: '道具',
+  }
+  return labels[type] || type
+}
+
+const getTypeClass = (type: string) => {
+  const classes: Record<string, string> = {
+    character: 'bg-purple-100 text-purple-600',
+    scene: 'bg-green-100 text-green-600',
+    prop: 'bg-orange-100 text-orange-600',
+  }
+  return classes[type] || 'bg-gray-100'
 }
 </script>

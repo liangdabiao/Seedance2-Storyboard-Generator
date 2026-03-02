@@ -7,6 +7,7 @@ import StoryboardEditor from '../views/StoryboardEditor.vue'
 import Assets from '../views/Assets.vue'
 import VideoTasks from '../views/VideoTasks.vue'
 import Workflow from '../views/Workflow.vue'
+import Settings from '../views/Settings.vue'
 
 const routes = [
   { path: '/', name: 'Dashboard', component: Dashboard },
@@ -17,6 +18,7 @@ const routes = [
   { path: '/assets', name: 'Assets', component: Assets },
   { path: '/tasks', name: 'VideoTasks', component: VideoTasks },
   { path: '/workflow', name: 'Workflow', component: Workflow },
+  { path: '/settings', name: 'Settings', component: Settings },
 ]
 
 const router = createRouter({

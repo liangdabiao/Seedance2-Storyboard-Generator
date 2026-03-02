@@ -85,6 +85,7 @@ public class ConfigController {
 
     /**
      * 测试连接
+     * 实际调用 Seedance API 验证配置
      */
     @PostMapping("/test")
     public ResponseEntity<?> testConnection() {
@@ -93,16 +94,22 @@ public class ConfigController {
                 return ResponseEntity.badRequest().body(createErrorResponse("配置不完整，请先配置 API 信息"));
             }
 
-            // 这里可以实现实际的 API 测试连接
-            // 暂时返回成功
-            Map<String, Object> data = new HashMap<>();
-            data.put("baseUrl", properties.getBaseUrl());
-            data.put("endpoint", properties.getEndpoint());
+            // 实际调用 API 测试连接
+            boolean success = configService.testConnection(properties);
+            
+            if (success) {
+                Map<String, Object> data = new HashMap<>();
+                data.put("baseUrl", properties.getBaseUrl());
+                data.put("endpoint", properties.getEndpoint());
+                data.put("testTime", java.time.LocalDateTime.now().toString());
 
-            return ResponseEntity.ok(createSuccessResponse("连接测试成功", data));
+                return ResponseEntity.ok(createSuccessResponse("连接测试成功！API 配置正确，可以正常调用 Seedance 服务", data));
+            } else {
+                return ResponseEntity.badRequest().body(createErrorResponse("连接测试失败：API 返回错误"));
+            }
         } catch (Exception e) {
             logger.error("连接测试失败", e);
-            return ResponseEntity.internalServerError().body(createErrorResponse("连接测试失败: " + e.getMessage()));
+            return ResponseEntity.badRequest().body(createErrorResponse("连接测试失败: " + e.getMessage()));
         }
     }
 
