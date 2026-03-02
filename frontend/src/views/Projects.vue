@@ -104,8 +104,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useProjectStore } from '../stores'
+import { projectApi } from '../api'
 import { TrashIcon } from '@heroicons/vue/24/outline'
 import { format } from 'date-fns'
 import { zhCN } from 'date-fns/locale'
@@ -113,6 +114,25 @@ import type { Project } from '../types'
 
 const projectStore = useProjectStore()
 const projects = computed(() => projectStore.projects)
+const loading = ref(false)
+
+// 加载项目列表
+onMounted(async () => {
+  await loadProjects()
+})
+
+const loadProjects = async () => {
+  loading.value = true
+  try {
+    const data = await projectApi.getProjects()
+    projectStore.setProjects(data)
+  } catch (error) {
+    console.error('加载项目失败:', error)
+    alert('加载项目失败，请检查后端服务是否运行')
+  } finally {
+    loading.value = false
+  }
+}
 
 const showCreateModal = ref(false)
 const newProject = ref({
@@ -120,24 +140,50 @@ const newProject = ref({
   description: '',
 })
 
-const createProject = () => {
-  const project: Project = {
-    id: Date.now().toString(),
-    title: newProject.value.title,
-    description: newProject.value.description,
-    status: 'draft',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    episodes: [],
+const createProject = async () => {
+  // 使用标题作为文件夹名（去除特殊字符）
+  const projectId = newProject.value.title
+    .replace(/[^\w\s\u4e00-\u9fa5]/g, '')
+    .replace(/\s+/g, '_')
+    .substring(0, 50)
+
+  if (!projectId) {
+    alert('项目名称无效')
+    return
   }
-  projectStore.addProject(project)
-  showCreateModal.value = false
-  newProject.value = { title: '', description: '' }
+
+  loading.value = true
+  try {
+    const project = await projectApi.createProject({
+      id: projectId,
+      title: newProject.value.title,
+      description: newProject.value.description,
+    })
+    projectStore.addProject(project)
+    showCreateModal.value = false
+    newProject.value = { title: '', description: '' }
+    alert('项目创建成功！')
+  } catch (error) {
+    console.error('创建项目失败:', error)
+    alert('创建项目失败: ' + (error as Error).message)
+  } finally {
+    loading.value = false
+  }
 }
 
-const deleteProject = (id: string) => {
-  if (confirm('确定要删除这个项目吗？')) {
-    // projectStore.removeProject(id)
+const deleteProject = async (id: string) => {
+  if (confirm('确定要删除这个项目吗？这将删除项目文件夹及其所有内容！')) {
+    loading.value = true
+    try {
+      await projectApi.deleteProject(id)
+      await loadProjects() // 重新加载列表
+      alert('项目删除成功')
+    } catch (error) {
+      console.error('删除项目失败:', error)
+      alert('删除项目失败: ' + (error as Error).message)
+    } finally {
+      loading.value = false
+    }
   }
 }
 

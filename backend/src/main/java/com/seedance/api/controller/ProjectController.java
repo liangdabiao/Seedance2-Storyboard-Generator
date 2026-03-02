@@ -133,9 +133,19 @@ public class ProjectController {
      * 创建项目
      */
     @PostMapping
-    public ResponseEntity<?> createProject(@RequestBody Project project) {
-        // 暂不支持创建，返回提示
-        return ResponseEntity.ok(createSuccessResponse("项目创建功能待实现", project));
+    public ResponseEntity<?> createProject(@RequestBody CreateProjectRequest request) {
+        try {
+            Project project = projectService.createProject(
+                request.getId(),
+                request.getTitle(),
+                request.getDescription()
+            );
+            return ResponseEntity.ok(createSuccessResponse("项目创建成功", project));
+        } catch (Exception e) {
+            logger.error("创建项目失败", e);
+            return ResponseEntity.badRequest()
+                .body(createErrorResponse("创建项目失败: " + e.getMessage()));
+        }
     }
 
     /**
@@ -152,8 +162,14 @@ public class ProjectController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteProject(@PathVariable String id) {
-        // 暂不支持删除，返回提示
-        return ResponseEntity.ok(createSuccessResponse("项目删除功能待实现", Map.of("id", id)));
+        try {
+            projectService.deleteProject(id);
+            return ResponseEntity.ok(createSuccessResponse("项目删除成功", Map.of("id", id)));
+        } catch (Exception e) {
+            logger.error("删除项目失败: {}", id, e);
+            return ResponseEntity.badRequest()
+                .body(createErrorResponse("删除项目失败: " + e.getMessage()));
+        }
     }
 
     private Map<String, Object> createSuccessResponse(String message, Object data) {
@@ -178,5 +194,38 @@ public class ProjectController {
         if (lower.endsWith(".gif")) return "image/gif";
         if (lower.endsWith(".webp")) return "image/webp";
         return "application/octet-stream";
+    }
+
+    /**
+     * 创建项目请求 DTO
+     */
+    public static class CreateProjectRequest {
+        private String id;
+        private String title;
+        private String description;
+
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public void setTitle(String title) {
+            this.title = title;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public void setDescription(String description) {
+            this.description = description;
+        }
     }
 }

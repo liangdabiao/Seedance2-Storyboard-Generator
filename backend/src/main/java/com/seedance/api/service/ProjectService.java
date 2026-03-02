@@ -339,6 +339,103 @@ public class ProjectService {
     }
 
     /**
+     * 创建新项目（创建文件夹）
+     */
+    public Project createProject(String projectId, String title, String description) {
+        try {
+            Path projectsPath = getProjectsPath();
+            Path projectPath = projectsPath.resolve(projectId);
+
+            // 检查项目是否已存在
+            if (Files.exists(projectPath)) {
+                throw new RuntimeException("项目已存在: " + projectId);
+            }
+
+            // 创建项目目录
+            Files.createDirectories(projectPath);
+
+            // 创建素材清单文件
+            Path materialFile = projectPath.resolve(projectId + "_素材清单.md");
+            String materialContent = "# " + (title != null ? title : projectId) + " — 素材清单\n\n" +
+                "## 角色素材 (C01-C99)\n\n" +
+                "## 场景素材 (S01-S99)\n\n" +
+                "## 道具素材 (P01-P99)\n\n" +
+                "## 风格前缀\n\n" +
+                "```\n" +
+                "Chinese ink wash painting style mixed with anime cel-shading\n" +
+                "```\n";
+            Files.writeString(materialFile, materialContent);
+
+            // 创建第一个分镜脚本文件
+            Path storyboardFile = projectPath.resolve(projectId + "_E01_分镜.md");
+            String storyboardContent = "# " + (title != null ? title : projectId) + " — 第01集分镜脚本\n\n" +
+                "**时长**：15秒  \n" +
+                "**画幅**：9:16 竖屏  \n\n" +
+                "---\n\n" +
+                "## Seedance Prompt\n\n" +
+                "```\n" +
+                "【风格】\n\n" +
+                "0-3s：\n" +
+                "3-6s：\n" +
+                "6-9s：\n" +
+                "9-12s：\n" +
+                "12-15s：\n\n" +
+                "【声音】\n" +
+                "```\n";
+            Files.writeString(storyboardFile, storyboardContent);
+
+            logger.info("项目创建成功: {}", projectPath);
+
+            // 返回加载的项目
+            return loadProject(projectPath);
+
+        } catch (IOException e) {
+            logger.error("创建项目失败: {}", projectId, e);
+            throw new RuntimeException("创建项目失败: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 删除项目（删除文件夹）
+     */
+    public void deleteProject(String projectId) {
+        try {
+            Path projectPath = getProjectsPath().resolve(projectId);
+
+            if (!Files.exists(projectPath)) {
+                throw new RuntimeException("项目不存在: " + projectId);
+            }
+
+            // 递归删除目录
+            deleteDirectory(projectPath);
+
+            logger.info("项目删除成功: {}", projectId);
+
+        } catch (IOException e) {
+            logger.error("删除项目失败: {}", projectId, e);
+            throw new RuntimeException("删除项目失败: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 递归删除目录
+     */
+    private void deleteDirectory(Path path) throws IOException {
+        if (Files.isDirectory(path)) {
+            try (var entries = Files.list(path)) {
+                entries.forEach(entry -> {
+                    try {
+                        deleteDirectory(entry);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+            }
+        }
+        Files.delete(path);
+    }
+
+    /**
      * 获取 projects 目录路径
      */
     private Path getProjectsPath() {
@@ -352,6 +449,16 @@ public class ProjectService {
         path = Paths.get("..", PROJECTS_DIR);
         if (Files.exists(path)) {
             return path.toAbsolutePath().normalize();
+        }
+
+        // 创建目录（如果不存在）
+        if (!Files.exists(path)) {
+            try {
+                Files.createDirectories(path);
+                logger.info("创建 projects 目录: {}", path);
+            } catch (IOException e) {
+                logger.warn("无法创建 projects 目录: {}", path);
+            }
         }
 
         // 使用当前目录

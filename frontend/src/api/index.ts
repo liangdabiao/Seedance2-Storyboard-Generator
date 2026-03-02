@@ -58,7 +58,7 @@ export const projectApi = {
     return response.data.data
   },
 
-  async createProject(project: Partial<Project>): Promise<Project> {
+  async createProject(project: { id: string; title: string; description?: string }): Promise<Project> {
     const response = await apiClient.post('/projects', project)
     return response.data.data
   },
@@ -69,7 +69,10 @@ export const projectApi = {
   },
 
   async deleteProject(id: string): Promise<void> {
-    await apiClient.delete(`/projects/${id}`)
+    const response = await apiClient.delete(`/projects/${id}`)
+    if (!response.data.success) {
+      throw new Error(response.data.message || '删除失败')
+    }
   },
 }
 
