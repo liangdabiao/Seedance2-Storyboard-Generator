@@ -51,8 +51,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useProjectStore } from '../stores'
+import { projectApi } from '../api'
 import { 
   FolderIcon, 
   VideoCameraIcon, 
@@ -65,6 +66,20 @@ import { zhCN } from 'date-fns/locale'
 const projectStore = useProjectStore()
 const projects = computed(() => projectStore.projects)
 const recentProjects = computed(() => projects.value.slice(0, 3))
+const loading = ref(false)
+
+// 加载项目数据
+onMounted(async () => {
+  loading.value = true
+  try {
+    const projects = await projectApi.getProjects()
+    projectStore.setProjects(projects)
+  } catch (error) {
+    console.error('加载项目失败:', error)
+  } finally {
+    loading.value = false
+  }
+})
 
 const stats = [
   { title: '项目总数', value: projects.value.length, icon: FolderIcon },
