@@ -1,3 +1,11 @@
+// 火山引擎配置
+export interface VolcengineConfig {
+  baseUrl: string
+  apiKey: string
+  endpoint: string
+  isConfigured?: boolean
+}
+
 // 项目类型
 export interface Project {
   id: string
