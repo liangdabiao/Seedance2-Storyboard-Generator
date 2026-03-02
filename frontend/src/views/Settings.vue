@@ -59,15 +59,15 @@
           
           <div>
             <label class="block text-gray-700 mb-2">
-              Endpoint ID <span class="text-red-500">*</span>
+              模型端点 (可选)
             </label>
-            <input 
+            <input
               v-model="config.endpoint"
               type="text"
               class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="ep-xxxxxxxxx"
+              placeholder="ep-xxxxxxxxx 或不填使用默认模型"
             />
-            <p class="text-sm text-gray-500 mt-1">推理接入点 ID，格式：ep-xxxxxxxxxx</p>
+            <p class="text-sm text-gray-500 mt-1">推理接入点 ID，格式：ep-xxxxxxxxxx。留空将使用默认模型 seedance-2.0-pro</p>
           </div>
         </div>
         
@@ -172,11 +172,10 @@ const saving = ref(false)
 const testing = ref(false)
 const message = ref({ type: '', text: '' })
 
-// 表单验证
+// 表单验证 - 只需要 API Key 和 Base URL
 const isFormValid = computed(() => {
   return config.value.baseUrl?.trim() && 
-         config.value.apiKey?.trim() && 
-         config.value.endpoint?.trim()
+         config.value.apiKey?.trim()
 })
 
 // 加载配置

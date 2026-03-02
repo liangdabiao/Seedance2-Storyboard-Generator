@@ -50,9 +50,9 @@ public class VideoGenerationService {
      */
     public String generateVideo(VideoGenerationRequest request) {
         try {
-            // 设置模型端点
+            // 设置模型端点（使用配置的 endpoint 或默认值）
             if (request.getModel() == null || request.getModel().isEmpty()) {
-                request.setModel(properties.getEndpoint());
+                request.setModel(properties.getModelEndpoint());
             }
 
             // 1. 创建任务
@@ -105,7 +105,7 @@ public class VideoGenerationService {
             logger.info("正在生成第 {}/{} 个视频", i + 1, prompts.size());
             try {
                 VideoGenerationRequest request = VideoGenerationRequest.builder()
-                    .model(properties.getEndpoint())
+                    .model(properties.getModelEndpoint())
                     .prompt(prompts.get(i))
                     .duration(duration)
                     .build();
@@ -128,9 +128,9 @@ public class VideoGenerationService {
      * @return 任务 ID
      */
     public String createVideoTask(VideoGenerationRequest request) {
-        // 设置模型端点
+        // 设置模型端点（使用配置的 endpoint 或默认值）
         if (request.getModel() == null || request.getModel().isEmpty()) {
-            request.setModel(properties.getEndpoint());
+            request.setModel(properties.getModelEndpoint());
         }
 
         VideoGenerationResponse response = client.createVideoGenerationTask(request);

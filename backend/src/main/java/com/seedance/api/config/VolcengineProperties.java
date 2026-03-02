@@ -40,10 +40,21 @@ public class VolcengineProperties {
 
     /**
      * 检查配置是否有效
+     * 只需要 API Key 和 Base URL，Endpoint ID 是可选的
      */
     public boolean isValid() {
-        return apiKey != null && !apiKey.isEmpty()
-                && endpoint != null && !endpoint.isEmpty();
+        return apiKey != null && !apiKey.isEmpty();
+    }
+    
+    /**
+     * 获取模型端点，如果未设置则返回默认模型
+     */
+    public String getModelEndpoint() {
+        if (endpoint != null && !endpoint.isEmpty()) {
+            return endpoint;
+        }
+        // 默认使用 Seedance 2.0 模型
+        return "seedance-2.0-pro";
     }
 
     /**

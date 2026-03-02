@@ -38,7 +38,7 @@ public class VideoController {
     public ResponseEntity<?> generateVideo(@RequestBody VideoGenerationRequest request) {
         try {
             if (!properties.isValid()) {
-                return ResponseEntity.badRequest().body(createErrorResponse("API 配置不完整，请先配置 API Key 和 Endpoint"));
+                return ResponseEntity.badRequest().body(createErrorResponse("API 配置不完整，请先配置 API Key"));
             }
 
             String videoUrl = videoService.generateVideo(request);
@@ -56,7 +56,7 @@ public class VideoController {
     public ResponseEntity<?> createVideoTask(@RequestBody VideoGenerationRequest request) {
         try {
             if (!properties.isValid()) {
-                return ResponseEntity.badRequest().body(createErrorResponse("API 配置不完整，请先配置 API Key 和 Endpoint"));
+                return ResponseEntity.badRequest().body(createErrorResponse("API 配置不完整，请先配置 API Key"));
             }
 
             String taskId = videoService.createVideoTask(request);

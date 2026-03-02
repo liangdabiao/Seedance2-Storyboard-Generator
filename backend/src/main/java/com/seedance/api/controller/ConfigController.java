@@ -54,9 +54,8 @@ public class ConfigController {
     public ResponseEntity<?> updateConfig(@RequestBody ConfigUpdateRequest request) {
         try {
             if (request.getBaseUrl() == null || request.getBaseUrl().isEmpty()
-                    || request.getApiKey() == null || request.getApiKey().isEmpty()
-                    || request.getEndpoint() == null || request.getEndpoint().isEmpty()) {
-                return ResponseEntity.badRequest().body(createErrorResponse("配置不完整，请填写所有必填项"));
+                    || request.getApiKey() == null || request.getApiKey().isEmpty()) {
+                return ResponseEntity.badRequest().body(createErrorResponse("配置不完整，API Key 和 Base URL 为必填项"));
             }
 
             // 更新配置属性

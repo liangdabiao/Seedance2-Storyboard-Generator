@@ -123,9 +123,9 @@ public class ConfigService {
 
             VideoGenerationClient client = new VideoGenerationClient(config);
 
-            // 创建一个简单的测试请求
+            // 创建一个简单的测试请求（使用 getModelEndpoint() 获取模型端点）
             VideoGenerationRequest request = VideoGenerationRequest.builder()
-                .model(properties.getEndpoint())
+                .model(properties.getModelEndpoint())
                 .prompt("a simple test video, one second of blue sky, minimal movement")
                 .duration(1)
                 .build();
