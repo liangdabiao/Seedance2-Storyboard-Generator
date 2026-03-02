@@ -1,12 +1,23 @@
+# Spring Boot 配置
+server:
+  port: 8080
+
 # 火山引擎配置
 volcengine:
   # API 基础地址
   base-url: https://ark.cn-beijing.volces.com
-  
+
   # API Key（从火山引擎控制台获取）
   # 注意：实际使用时请替换为你的真实 API Key
   api-key: your-api-key-here
-  
+
   # 推理接入点 ID（Endpoint ID）
   # 格式：ep-xxxxxxxxxx
   endpoint: ep-your-endpoint-id
+
+# 日志配置
+logging:
+  level:
+    com.seedance: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
