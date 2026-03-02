@@ -1,4 +1,4 @@
-package main.java.com.seedance.example;
+package com.seedance.example;
 
 import com.seedance.api.client.VideoGenerationClient;
 import com.seedance.api.config.ApiConfig;
