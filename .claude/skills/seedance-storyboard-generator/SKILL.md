@@ -7,19 +7,27 @@ description: Professional AI video script and storyboard generator for Seedance 
 
 Expert AI script and storyboard generation system for creating professional AI video series on Seedance 2.0 platform.
 
-## Core Concept: 首帧+尾帧 Format
+## Core Concept: 首帧+尾帧 & 视频延长 混合模式
 
-Seedance 2.0 每次生成视频只支持 **首帧图片(@图片1) + 尾帧/参考图片(@图片2)** 的格式。因此：
+Seedance 2.0 每次生成视频支持两种核心方式：
 
-- 每集（15秒）需拆分为**多个片段**（通常5段，每段约3秒）
-- 每个片段需要一张**首帧图片**上传为 @图片1
-- 可选上传一张**尾帧参考或道具/角色参考**作为 @图片2
-- 前一片段的尾帧 = 下一片段的首帧（保证连贯性）
-- 片段之间可使用 `将@视频1延长` 接续，效果更好
+### 方式一：首帧图片生成（用于片段1）
+- 上传 **@图片1（首帧）** + 可选 **@图片2（参考）**
+- 用结构化 prompt 描述从首帧到尾帧的变化过程
+
+### 方式二：视频延长（用于片段2+，连贯性更好）
+- 上传前一段视频为 **@视频1**，可选 **@图片1（参考）**
+- 使用 `将@视频1延长` 开头 + 简短结构化描述
+- 角色/场景自动保持一致，无接缝
+
+### 推荐拆分策略：3段×5秒
+
+每集15秒拆为**3个片段**（每段约5秒），比5段×3秒更优：
+- 仅2个接缝点（vs 4个），连贯性更好
+- 每段有足够叙事空间
+- 片段2-3优先用视频延长，失败时备用KF首帧独立生成
 
 ## Workflow
-
-Follow this sequential process to convert source material into production-ready video scripts:
 
 ### 1. Analyze Input
 
@@ -72,9 +80,9 @@ Document these parameters for consistent application throughout.
 | Characters | C | C01-C99 | 角色多角度参考 | C01 天机师·正面全身 |
 | Scenes | S | S01-S99 | 场景/地点 | S01 仙山云雾·悬崖古松 |
 | Props | P | P01-P99 | 道具/物件 | P01 天机盘 |
-| **Key Frames** | **KF** | **KF01-KF99** | **每个片段的首帧图片** | **KF01 首帧·雾山幽光** |
+| **Key Frames** | **KF** | **KF01-KF99** | **片段首帧图片** | **KF01 首帧·雾山幽光** |
 
-> **关键帧 (KF)** 是新增的核心素材类型。每个视频片段都需要一张 KF 图片作为首帧上传。KF 图片是角色+场景+道具的合成画面，描述该片段开始时的精确画面状态。
+> **关键帧 (KF)** 是核心素材类型。片段1必须使用KF作为首帧上传；片段2-3优先用视频延长，KF作为备用方案。
 
 **Asset generation prompt format:**
 ```
@@ -91,75 +99,160 @@ Document these parameters for consistent application throughout.
 
 **Character differentiation:** Use distinct color schemes and visual markers for each character to ensure recognition in the chosen art style.
 
-**Output format:** Organized list with unique IDs, suitable for copy-pasting into image generators.
+### 5. Generate Seedance 2.0 Storyboard Scripts
 
-### 5. Generate Seedance 2.0 Storyboard Scripts (首帧+尾帧 Format)
+**将每集拆分为3个片段**（每段约5秒），采用混合生成策略。
 
-**将每集拆分为多个片段**，通常 5 段（每段约 3 秒）。每个片段生成以下内容：
+---
 
-**a. 上传素材表 — 明确标注 @图片1 和 @图片2 对应的素材编号**
+#### 片段1：首帧图片生成（独立生成）
 
-```
-| 槽位 | 素材编号 | 内容 |
+**上传素材表：**
+
+| 槽位 | 素材编号 | 说明 |
 |------|----------|------|
-| @图片1（首帧） | **KF01** | [首帧画面描述] |
-| @图片2（参考） | **C01/S01/P01** | [参考图用途说明] |
-```
+| @图片1（首帧） | **KFXX** | 关键帧首帧图片 |
+| @图片2（参考） | **CXX/SXX/PXX** | 角色/场景/道具参考 |
 
-- **@图片1** 必须是关键帧 (KF) 素材，作为视频起始画面
-- **@图片2** 用于角色一致性、场景风格或道具细节参考
-
-**b. Seedance Prompt — 首帧+尾帧格式**
+**Prompt 格式 — 结构化关键词：**
 
 ```
-[风格描述]，[画幅比例]
+[风格]，[画幅]
+@图片1首帧，@图片2[用途]参考
 
-以@图片1为首帧，@图片2为[用途]参考
-
-[首帧画面描述]，[镜头运动]，[动作/变化过程描述]，[尾帧画面描述]
+【镜头】[起始镜头] → [结束镜头]
+【主体】[人物/物体状态和位置]
+【变化】[状态A] → [状态B] → [状态C]
+【光影】[光源和氛围变化]
+【声音】[配乐] + [音效]
 ```
 
 **Prompt 要求：**
-- 开头必须写明风格和画幅
-- 紧接着声明 @图片1 和 @图片2 的用途
-- 正文描述从首帧状态到尾帧状态的**完整运动过程**
-- 控制在 200 字以内，避免过长导致指令跟随不一致
-- **不使用时间轴分段格式**（如 0-3s、3-6s），因为平台不支持
+- 使用【】分类标签，每个维度独立清晰
+- 用 → 箭头表示状态变化过程
+- 总字数控制在 **120字以内**
+- 每个标签1行，不写长句
 
-**c. 尾帧描述**
-- 文字描述该片段结尾的精确画面状态
-- 用于确认片段间衔接、以及生成下一片段的 KF 首帧图片
+**【声音】标签规范：**
+每个片段的 prompt 必须包含【声音】标签，格式为：
+```
+【声音】[配乐风格] + [环境音效] + [动作音效] + [对白/旁白]（如有）
+```
+- **配乐**：描述音乐风格和情绪走向（如"空灵古琴渐强"、"紧张弦乐"）
+- **环境音**：场景自然声音（如"山风呼啸"、"雨声淅沥"）
+- **动作音效**：与画面动作对应的声音（如"剑鸣"、"脚步声渐远"）
+- **对白/旁白**：如有台词需标注语气和内容
+- 音效应与画面【变化】节奏匹配（如光芒消退时配乐渐弱）
+- Seedance 支持上传 @音频X 作为配乐/音效参考（≤3个，总时长≤15s）
 
-**d. 片段间衔接**
-- 优先使用 `将@视频1延长` 接续上一段视频（连贯性更好）
-- 若效果不好，用该片段的 KF 首帧图片独立生成
+---
 
-**Camera movement keywords:** 推镜头/拉镜头/摇镜头/移镜头/跟镜头/环绕镜头/升降镜头/希区柯克变焦/一镜到底/手持晃动
+#### 片段2-3：视频延长（优先方案）
 
-**For episode chaining (Ep 2+):** Start prompt with `将@视频1延长` and upload previous episode's last clip as video reference.
+**上传素材表：**
 
-### 6. Storyboard Template (Single Clip)
+| 槽位 | 素材编号 | 说明 |
+|------|----------|------|
+| @视频1 | 上一片段视频 | 延长源 |
+| @图片1（参考） | **CXX/SXX/PXX** | 可选，角色/道具参考 |
+
+**Prompt 格式：**
+
+```
+将@视频1延长，[风格]，[画幅]
+@图片1[用途]参考
+
+【镜头】[镜头变化]
+【主体】[人物动作发展]
+【变化】[从当前状态] → [新状态]
+【光影】[光影变化]
+【声音】[配乐] + [音效]
+```
+
+**声音延续：** 视频延长时声音设计应与上一片段衔接，保持配乐连贯性，音效随画面变化自然过渡。
+
+**如果视频延长效果不好，使用备用方案：**
+
+| 槽位 | 素材编号 | 说明 |
+|------|----------|------|
+| @图片1（首帧） | **KFXX** | 备用关键帧首帧 |
+| @图片2（参考） | **CXX/SXX/PXX** | 角色/场景/道具参考 |
+
+备用 prompt 与片段1格式相同。
+
+---
+
+### 6. Storyboard Templates
+
+#### Template A：首帧生成片段（片段1）
 
 ```markdown
-## 片段X：[名称]（Xs-Ys）
+## 片段1：[名称]（0-5s）
 
 ### 上传素材
 | 槽位 | 素材编号 | 内容 |
 |------|----------|------|
-| @图片1（首帧） | **KFXX** | [首帧名称] — [画面简述] |
-| @图片2（参考） | **CXX/SXX/PXX** | [素材名称] — [参考用途] |
+| @图片1（首帧） | **KF01** | [名称] — [画面简述] |
+| @图片2（参考） | **CXX/SXX** | [名称] — [参考用途] |
 
 ### Seedance Prompt
-​```
+｜```
 [风格]，[画幅]
+@图片1首帧，@图片2[用途]参考
 
-以@图片1为首帧，@图片2为[用途]参考
-
-[完整的运动过程描述，从首帧画面到尾帧画面]
-​```
+【镜头】[起始] → [结束]
+【主体】[描述]
+【变化】[A] → [B] → [C]
+【光影】[描述]
+【声音】[配乐] + [音效]
+｜```
 
 ### 尾帧描述
-[精确的尾帧画面状态文字描述]
+[精确的尾帧画面状态]
+```
+
+#### Template B：视频延长片段（片段2-3）
+
+```markdown
+## 片段2：[名称]（5-10s）
+
+### 方案A：视频延长（优先）
+| 槽位 | 素材编号 | 内容 |
+|------|----------|------|
+| @视频1 | 片段1视频 | 延长源 |
+| @图片1（参考） | **CXX/PXX** | [名称] — [参考用途] |
+
+#### Seedance Prompt
+｜```
+将@视频1延长，[风格]，[画幅]
+@图片1[用途]参考
+
+【镜头】[变化]
+【主体】[动作发展]
+【变化】[当前] → [新状态]
+【声音】[配乐] + [音效]
+｜```
+
+### 方案B：独立生成（备用）
+| 槽位 | 素材编号 | 内容 |
+|------|----------|------|
+| @图片1（首帧） | **KF02** | [名称] — [画面简述] |
+| @图片2（参考） | **CXX/SXX** | [名称] — [参考用途] |
+
+#### Seedance Prompt
+｜```
+[风格]，[画幅]
+@图片1首帧，@图片2[用途]参考
+
+【镜头】[起始] → [结束]
+【主体】[描述]
+【变化】[A] → [B] → [C]
+【光影】[描述]
+【声音】[配乐] + [音效]
+｜```
+
+### 尾帧描述
+[精确的尾帧画面状态]
 ```
 
 ## Output Files
@@ -171,47 +264,42 @@ Generate these deliverable files, saved to `projects/[ProjectName]/`:
    - Characters (C01-C99)
    - Scenes (S01-S99)
    - Props (P01-P99)
-   - Key Frames (KF01-KF99) — 每个片段的首帧图片
+   - Key Frames (KF01-KF99) — 片段1必须的首帧 + 片段2-3的备用首帧
 3. **[Title]_E[XX]_分镜.md** - Individual episode storyboard, containing:
-   - 制作流程概览表（片段 / @图片1 / @图片2 / 镜头概要）
-   - 每个片段的完整 Seedance Prompt（首帧+尾帧格式）
+   - 制作流程概览表（片段 / 生成方式 / 素材 / 镜头概要）
+   - 每个片段提供方案A（视频延长）和方案B（独立首帧）
    - 尾帧描述和衔接提示
    - 导演备注
 
 ## 生图顺序建议
 
-在素材清单末尾提供推荐的生图顺序：
-
 1. **角色 (C)** — 先锁定角色形象一致性
 2. **场景 (S) + 道具 (P)** — 确定环境和道具风格
-3. **关键帧 (KF)** — 最后按片段顺序生成，用前面的 C/S/P 素材做参考，确保画面衔接
+3. **关键帧 (KF)** — 最后按片段顺序生成，用 C/S/P 素材做参考
 
 ## Quality Assurance
 
 **Before finalizing:**
-- 每个片段的 Prompt 中必须明确写出 `以@图片1为首帧，@图片2为XX参考`
-- 上传素材表必须标注 @图片1 和 @图片2 对应的素材编号
-- 前一片段的尾帧描述必须与下一片段的 KF 首帧内容吻合
-- 每集的关键帧 (KF) 数量 = 片段数量（通常 5 个）
-- 每个 Prompt 控制在 200 字以内
+- 片段1的 prompt 中明确写出 `@图片1首帧，@图片2为XX参考`
+- 片段2-3的方案A以 `将@视频1延长` 开头
+- 片段2-3同时提供方案B备用（独立KF首帧）
+- 每个 prompt 使用【】结构化标签
+- 每个 prompt 控制在 **120字以内**
+- **每个片段必须包含【声音】标签**，配乐/音效/对白缺一不可（无对白时可省略对白项）
+- 片段间声音设计应连贯过渡，不出现突兀断裂
 - 验证无敏感词
+- 前一片段尾帧描述与下一片段首帧/延长内容吻合
 
 ## Reference Material
 
 For detailed Seedance 2.0 prompt patterns, templates, and best practices, see [references/seedance-manual.md](references/seedance-manual.md).
 
-Key reference sections:
-- Templates 1-16 for different video types (叙事/产品/角色/风景/战争/等)
-- Camera movement quick reference
-- Atmosphere keyword library
-- Multimodal reference syntax (@图片X, @视频X, @音频X)
-
 ## Common Pitfalls to Avoid
 
-1. **不要使用时间轴格式**：Seedance 不支持 `0-3s画面` 这种分段格式，必须使用首帧+尾帧格式
-2. **Sensitive words**: Seedance may reject content with certain terms. Avoid common triggers or use alternative phrasing.
-3. **Over-complex prompts**: Keep prompts under 200 words. Long prompts (300+ words) have inconsistent instruction following.
-4. **Missing @图片 mapping**: Every prompt must explicitly state which asset is @图片1 and @图片2.
-5. **Missing key frames**: Every clip needs a KF asset. Total KF count per episode = number of clips.
-6. **Missing continuity**: Clip N's ending frame must match Clip N+1's KF starting frame.
-7. **Inconsistent style**: Apply same visual style prefix to all asset generation prompts.
+1. **不要写散文长句**：使用【镜头】【主体】【变化】【光影】【声音】结构化标签，每行一个维度
+2. **不要使用时间轴格式**：不写 `0-3s画面` 分段，使用 → 箭头表示状态变化
+3. **Prompt 不超过120字**：超长 prompt 指令跟随不稳定
+4. **片段2-3优先视频延长**：连贯性远优于独立首帧生成
+5. **Sensitive words**: 避免敏感词触发审核
+6. **必须标注素材编号**：@图片1/@图片2/@视频1 对应哪个素材编号
+7. **Style consistency**: 所有素材生成 prompt 使用相同风格前缀
