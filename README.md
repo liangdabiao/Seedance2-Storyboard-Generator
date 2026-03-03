@@ -1,5 +1,7 @@
 # AI 视频制作工作流
 
+![](./docs/image.png)
+
 基于 Claude Code + Skill + Seedance 2.0 的完整 AI 视频制作流程，专注于将小说、故事转化为多集视频系列。
 
 本项目参考学习了： 《用 Seedance 2.0 做了 20 集水墨漫剧，聊聊真实体验》北极的树 闲话AI ，感谢作者。
