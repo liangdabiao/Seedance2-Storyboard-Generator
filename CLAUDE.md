@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Overview
 
-This is a Chinese-language repository for AI video production workflow combining Claude Code (script and storyboard generation), Nana Banana Pro (asset generation), and Seedance 2.0 (video generation). The workflow transforms stories and novels into multi-episode AI video series with consistent visual style and character design.
+This is a Chinese-language repository for AI video production workflow combining Claude Code (script and storyboard generation), GPT-Image-2、Seedream 、Nana Banana Pro 等 (asset generation), and Seedance 2.0 (video generation). The workflow transforms stories and novels into multi-episode AI video series with consistent visual style and character design.
 
 ## Core Workflow
 
@@ -12,7 +12,7 @@ The production process follows these steps:
 
 1. **Script Development** - Converting source material into four-act structure scripts
 2. **Asset Generation Plan** - Creating numbered prompts for characters (C01-C99), scenes (S01-S99), and props (P01-P99)
-3. **Image Generation** - Using Nana Banana Pro to generate visual assets with consistent style prefixes
+3. **Image Generation** - Using GPT-Image-2、Seedream 、Nana Banana Pro 等 to generate visual assets with consistent style prefixes
 4. **Storyboard Script Generation** - Creating Seedance 2.0 prompts in time-axis format (0-3s, 3-6s, 6-9s, 9-12s, 12-15s)
 5. **Video Generation** - Using Seedance 2.0 platform with video extension feature for episode chaining
 
