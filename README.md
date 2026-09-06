@@ -4,7 +4,7 @@
 
 本项目参考学习了： 《用 Seedance 2.0 做了 20 集水墨漫剧，聊聊真实体验》北极的树 闲话AI ，感谢作者。
 
-感谢厚爱，已经上线直接免费使用：[ https://www.coze.cn/?skill_share_pid=7609341973090041882](https://skillhub.cn/skills/user_8bb4b4f5/seedance2-storyboard-generator)
+感谢厚爱，已经上线直接免费使用： https://skillhub.cn/skills/user_8bb4b4f5/seedance2-storyboard-generator
 
 项目首发于linux.do社区，感谢佬友认同： https://linux.do/t/topic/1619920
 
