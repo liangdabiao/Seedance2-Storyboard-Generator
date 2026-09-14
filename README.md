@@ -22,7 +22,7 @@
 
 本项目提供了一套完整的 AI 视频制作工作流，通过三件套工具实现从故事到成片的自动化生产：
 
-- **Claude Code** - 剧本创作与分镜脚本生成
+- **Claude Code/Codex/workbuddy等** - 剧本创作与分镜脚本生成
 - **GPT-Image-2、Seedream 、Nana Banana Pro 等** - 角色、场景、道具素材图生成(可选其他生图ai)
 - **Seedance 2.0** - 视频生成与延长
 
