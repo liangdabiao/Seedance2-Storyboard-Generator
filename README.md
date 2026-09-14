@@ -4,6 +4,8 @@
 
 安装方法： 命令agent 直接安装：https://github.com/liangdabiao/Seedance2-Storyboard-Generator
 
+我推荐同时安装 即梦cli:https://jimeng.jianying.com/ai-tool/install?from_page=explore , 这结合起来就可以随心所欲，vibe video，说话就可以生成和编辑视频！
+
 本项目参考学习了： 《用 Seedance 2.0 做了 20 集水墨漫剧，聊聊真实体验》北极的树 闲话AI ，感谢作者。
 
 感谢厚爱，已经上线直接免费使用： https://skillhub.cn/skills/user_8bb4b4f5/seedance2-storyboard-generator
