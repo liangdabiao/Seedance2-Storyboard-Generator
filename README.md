@@ -7,9 +7,13 @@
 我推荐同时安装 即梦cli:https://jimeng.jianying.com/ai-tool/install?from_page=explore , 这结合起来就可以随心所欲，vibe video，说话就可以生成和编辑视频！例如：
 
 > 利用 Seedance skill 制作 短视频， 故事为： 孟母三迁， 而生图生视频直接使用 即梦cli
+
 > 请利用 edge-tts 给短视频配上旁边，通俗易懂
+
 > 第三段视频和第四段需要增加一个过渡连接的视频
+
 > 30秒的镜头不对，修改为长镜头
+
 
 本项目参考学习了： 《用 Seedance 2.0 做了 20 集水墨漫剧，聊聊真实体验》北极的树 闲话AI ，感谢作者。
 
