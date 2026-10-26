@@ -25,7 +25,7 @@
 
 乐高大电影风格： https://github.com/liangdabiao/lego-cinematic-remix
 
-如果想不需要付费seedance这些，也能够生成免费的视频，我推荐我这个：  [https://github.com/liangdabiao/whiteboard-explainer](https://github.com/liangdabiao/whiteboard-teacher-video)
+如果想不需要付费seedance这些，也能够生成免费的视频，我推荐我这个：  https://github.com/liangdabiao/whiteboard-teacher-video
 
 项目首发于linux.do社区，感谢佬友认同： https://linux.do/t/topic/1619920
 
