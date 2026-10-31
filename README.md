@@ -27,6 +27,9 @@
 
 如果想不需要付费seedance这些，也能够生成免费的视频，我推荐我这个：  https://github.com/liangdabiao/whiteboard-teacher-video
 
+用AI声音克隆 + 视频生成模型， 真人视频和语音。 用AI一键生成 数字人播报视频，甚至连口型和表情都极其逼真: 
+https://github.com/liangdabiao/digital-human-koubo
+
 项目首发于linux.do社区，感谢佬友认同： https://linux.do/t/topic/1619920
 
 
