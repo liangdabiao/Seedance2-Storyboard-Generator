@@ -17,7 +17,7 @@
 
 本项目参考学习了： 《用 Seedance 2.0 做了 20 集水墨漫剧，聊聊真实体验》北极的树 闲话AI ，感谢作者。
 
-感谢厚爱，已经上线直接免费使用： https://skillhub.cn/skills/user_8bb4b4f5/seedance2-storyboard-generator
+本项目升级DeepSeek Harness工作台：https://github.com/liangdabiao/dsh-seedance-studio
 
 同时基于本项目，我再制作几个风格版本给大家试试：
 
