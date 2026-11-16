@@ -17,6 +17,8 @@
 
 本项目参考学习了： 《用 Seedance 2.0 做了 20 集水墨漫剧，聊聊真实体验》北极的树 闲话AI ，感谢作者。
 
+新版本来了！真人短剧版： https://github.com/liangdabiao/seedance-storyboard-generator-realman
+
 本项目升级DeepSeek Harness工作台：https://github.com/liangdabiao/dsh-seedance-studio
 
 同时基于本项目，我再制作几个风格版本给大家试试：
