@@ -2,7 +2,7 @@
 
 基于  Skill + Seedance 2.0 的完整 AI 视频制作流程，专注于将小说、故事转化为多集视频系列。 在codex/workbuddy等agent直接命令使用则可以。
 
-安装方法： 命令agent 直接安装：https://github.com/liangdabiao/Seedance2-Storyboard-Generator
+安装方法： 命令 codex/workbuddy等agent 直接安装这个skill：https://github.com/liangdabiao/Seedance2-Storyboard-Generator
 
 我推荐同时安装 即梦cli:https://jimeng.jianying.com/ai-tool/install?from_page=explore , 这结合起来就可以随心所欲，vibe video，说话就可以生成和编辑视频！例如：
 
